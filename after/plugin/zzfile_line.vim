@@ -11,12 +11,12 @@ function! s:gotoline()
 	" As a workarround Jonas Pfenniger<jonas@pfenniger.name> added an
 	" AutoCmd BufRead, this will test if this file actually exists before
 	" searching for a file and line to goto.
-	if (filereadable(file))
+	if filereadable(file)
 		return
 	endif
 
 	" Accept file:line:column: or file:line:column and file:line also
-	let names =  matchlist( file, '\(.\{-1,}\):\%(\(\d\+\)\%(:\(\d*\):\?\)\?\)\?$')
+	let names = matchlist( file, '\(.\{-1,}\):\%(\(\d\+\)\%(:\(\d*\):\?\)\?\)\?$')
 
 	if empty(names)
 		return
@@ -40,16 +40,13 @@ function! s:gotoline()
 		endif
 
 		exec "keepalt" edit_cmd
-		exec line_num . "normal! " . col_num . '|'
-		if foldlevel(line_num) > 0
-			exec "normal! zv"
+
+		if line_num <= line('$')
+			exec line_num . "normal! " . col_num . '|zvzz'
 		endif
-		exec "normal! zz"
 
 		exec l:bufn "bwipeout"
 	endif
-
 endfunction
 
-autocmd! BufNewFile *:* nested call s:gotoline()
-autocmd! BufRead *:* nested call s:gotoline()
+autocmd! BufNewFile,BufRead *:* nested call s:gotoline()
