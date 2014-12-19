@@ -29,8 +29,8 @@ function! s:gotoline()
 	if filereadable(file_name)
 		let l:bufn = bufnr("%")
 
-		exec "keepalt edit " . file_name
-		exec ":" . line_num
+		exec "keepalt edit " . ingo#compat#fnameescape(file_name)
+		exec line_num
 		exec "normal! " . col_num . '|'
 		if foldlevel(line_num) > 0
 			exec "normal! zv"
