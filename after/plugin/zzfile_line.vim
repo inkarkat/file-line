@@ -29,15 +29,24 @@ function! s:gotoline()
 	if filereadable(file_name)
 		let l:bufn = bufnr("%")
 
-		exec "keepalt edit " . ingo#compat#fnameescape(file_name)
-		exec line_num
-		exec "normal! " . col_num . '|'
+		let edit_cmd = 'edit ' . ingo#compat#fnameescape(file_name)
+		if argc() > 0
+			let argidx = argidx()
+			if file ==# argv(argidx)
+				exec (argidx + 1) . 'argdelete'
+				exec argidx . 'argadd' ingo#compat#fnameescape(file_name)
+				let edit_cmd = (argidx + 1) . 'argument'
+			endif
+		endif
+
+		exec "keepalt" edit_cmd
+		exec line_num . "normal! " . col_num . '|'
 		if foldlevel(line_num) > 0
 			exec "normal! zv"
 		endif
 		exec "normal! zz"
 
-		exec ":bwipeout " l:bufn
+		exec l:bufn "bwipeout"
 	endif
 
 endfunction
